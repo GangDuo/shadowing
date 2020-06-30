@@ -17,7 +17,9 @@
     "test": "react-app-rewired test",
     "eject": "react-scripts eject",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build"
+    "deploy": "gh-pages -d build",
+    "dev": "HTTPS=true npm start",
+    "dev:win": "set HTTPS=true&&npm start"
   },
   "eslintConfig": {
     "extends": "react-app"
