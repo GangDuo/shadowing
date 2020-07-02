@@ -18,7 +18,6 @@ const styles = css`
 
 .shiny-btn {
   position: relative;
-  cursor: pointer;
   overflow: hidden;
 }
 
@@ -47,6 +46,11 @@ const styles = css`
   left: 50%;
 }
 
+.microphone-on,
+.microphone-off {
+  cursor: pointer;
+}
+
 .microphone-on {
   background: #1373C7;
   width: 80px;
@@ -56,8 +60,8 @@ const styles = css`
 
 .microphone-off {
   background: #FFF;
-  width: 75px;
-  height: 75px;
+  width: 70px;
+  height: 70px;
   border: solid 5px #ED1C22;
   color: #1373C7;
 }
