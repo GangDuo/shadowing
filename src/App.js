@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
 import SpeechDaemon from './SpeechDaemon';
 import styles from './AppStyles';
+import MicrophoneSwitch from './components/MicrophoneSwitch';
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faMicrophone, faPlayCircle, faStopCircle } from '@fortawesome/free-solid-svg-icons'
 
@@ -111,12 +112,13 @@ var langs =
  ['ภาษาไทย',         ['th-TH']]];
 
 function App() {
-  const speechLog = useRef();
-  const speech = useRef();
+  const speechLog = useRef('');
+  const speech = useRef(new SpeechDaemon());
   const [selectedIndex, setSelectedIndex] = useState(57);
   const [dialect, setDialect] = useState(langs[selectedIndex][1][0]);
   const [finalTranscript, setFinalTranscript] = useState('');
   const [interimTranscript, setInterimTranscript] = useState('');
+  const [isPowerOn, setIsPowerOn] = useState(false);
 
   const updateCountry = e => {
     speech.current.lang = langs[e.target.value][1][0]
@@ -127,8 +129,7 @@ function App() {
   }
 
   const initialize = _ => {
-    speechLog.current = ''
-    speech.current = new SpeechDaemon()
+    console.log('初期化処理')
     speech.current.on('result', (event) => {
       let transcript = ''
       let buf = ''
@@ -155,10 +156,17 @@ function App() {
     }).on('error', (event) => {
       console.log('エラー: ' + event.error)
     })
-    .listen()
   }
 
   useEffect(initialize, [])
+
+  if(isPowerOn) {
+    console.log('Microphone On')
+    speech.current.listen()
+  } else {
+    console.log('onMicrophone Off')
+    speech.current.kill()
+  }
 
   return (
     <div className="app">
@@ -182,6 +190,8 @@ function App() {
         </select>
       </div>
 
+      <MicrophoneSwitch isPowerOn={isPowerOn}
+                        onClick={() => {setIsPowerOn(!isPowerOn)}} />
       <style jsx>{styles}</style>
     </div>
   );
