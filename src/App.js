@@ -136,6 +136,9 @@ function App() {
       for (let i = event.resultIndex; i < event.results.length; i++) {
         transcript = event.results[i][0].transcript;
         if (event.results[i].isFinal) {
+          if (speech.current.lang === 'ja-JP') {
+            transcript += '。';
+          }
           speechLog.current += transcript + '\n'
           console.log(speechLog.current)
           setFinalTranscript(speechLog.current)
@@ -162,16 +165,24 @@ function App() {
 
   if(isPowerOn) {
     console.log('Microphone On')
+    speech.current.lang = dialect
     speech.current.listen()
   } else {
     console.log('onMicrophone Off')
     speech.current.kill()
   }
 
+  const latelyTranscript = (n) => {
+    return finalTranscript.split('\n')
+      .filter(x => x.length > 0)
+      .slice(-1 * n)
+      .map((x, i) => <p key={i}>{x}</p>)
+  }
+
   return (
     <div className="app">
       <div id="results">
-        <span className="final" id="final_span">{finalTranscript}</span>
+        <span className="final" id="final_span">{latelyTranscript(10)}</span>
         <span className="interim" id="interim_span" style={{color: "gray"}}>{interimTranscript}</span>
       </div>
 
