@@ -33,15 +33,21 @@ export default class SpeechDaemon extends EventEmitter {
     };
     recognition.onend = _ => {
       console.log(`${new Date()} <<<<<- 音声認識サービス切断`)
+      this.hasAlreadyStarted = false
       this.emit('end', null)
       if(this.isIdle) return;
       this.listen()
     };
     this.recognition = recognition
     this.isIdle = false
+    this.hasAlreadyStarted = false
   }
 
   listen() {
+    if(this.hasAlreadyStarted) {
+      return
+    }
+    this.hasAlreadyStarted = true
     this.isIdle = false
     if(this.lang) {
       this.recognition.lang = this.lang
