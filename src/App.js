@@ -2,6 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
 import SpeechDaemon from './SpeechDaemon';
 import styles from './AppStyles';
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { faMicrophone, faPlayCircle, faStopCircle } from '@fortawesome/free-solid-svg-icons'
+
+library.add(faMicrophone, faPlayCircle, faStopCircle)
 
 var langs =
 [['Afrikaans',       ['af-ZA']],
