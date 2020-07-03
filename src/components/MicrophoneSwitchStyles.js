@@ -1,6 +1,10 @@
 import css from 'styled-jsx/css'
 
 const styles = css`
+.microphone-switch {
+  position: relative;
+}
+
 @keyframes shiny {
   0% {
     transform: scale(0) rotate(25deg);
@@ -41,9 +45,6 @@ const styles = css`
   align-items: center;
   justify-content: center;
   text-align: center;
-  position: absolute;
-  top: 50%;
-  left: 50%;
 }
 
 .microphone-on,
@@ -67,6 +68,9 @@ const styles = css`
 }
 
 .heartbeat {
+  position: absolute;
+  top: 0;
+  left: 0;
   animation: pounding .1s linear infinite alternate;
   opacity: 0.2;
   z-index: -99;

@@ -12,6 +12,11 @@ const styles = css`
   text-align: left;
   min-height: 100px;
 }
+
+.tools {
+  display: flex;
+  justify-content: space-between;
+}
 `
 
 export default styles

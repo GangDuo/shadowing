@@ -194,27 +194,27 @@ function App() {
         <span className="interim" id="interim_span" style={{color: "gray"}}>{interimTranscript}</span>
       </div>
 
-      <div className="compact marquee" id="div_language">
-        <select id="select_language" value={selectedIndex} onChange={updateCountry}>
-        {
-          langs.map((x, i) => <option key={x[0]} value={i}>{x[0]}</option>)
-        }
-        </select>&nbsp;&nbsp; 
-        <select id="select_dialect" style={{visibility: langs[selectedIndex][1].length === 1 ? 'hidden' : 'visible'}}>
-        {
-          langs[selectedIndex]
-            .filter((x, i) => i > 0)
-            .map((x ,i) => <option key={i} value={x[0]}>{x[1]||''}</option>)
-        }
-        </select>
-      </div>
+      <div className="tools">
+        <div className="compact marquee" id="div_language">
+          <select id="select_language" value={selectedIndex} onChange={updateCountry}>
+          {
+            langs.map((x, i) => <option key={x[0]} value={i}>{x[0]}</option>)
+          }
+          </select>&nbsp;&nbsp; 
+          <select id="select_dialect" style={{visibility: langs[selectedIndex][1].length === 1 ? 'hidden' : 'visible'}}>
+          {
+            langs[selectedIndex]
+              .filter((x, i) => i > 0)
+              .map((x ,i) => <option key={i} value={x[0]}>{x[1]||''}</option>)
+          }
+          </select>
+        </div>
 
-      <div>
-        <input type="button" value="ログをダウンロード" onClick={downloadLogFile} />
-      </div>
+        <MicrophoneSwitch isPowerOn={isPowerOn}
+                          onClick={() => {setIsPowerOn(!isPowerOn)}} />
 
-      <MicrophoneSwitch isPowerOn={isPowerOn}
-                        onClick={() => {setIsPowerOn(!isPowerOn)}} />
+        <div><input type="button" value="ログをダウンロード" onClick={downloadLogFile} /></div>
+      </div>
       <style jsx>{styles}</style>
     </div>
   );

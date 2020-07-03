@@ -10,7 +10,7 @@ function MicrophoneSwitch(props) {
   }
 
   return (
-  <>
+  <div className="microphone-switch">
     <div id="microphone"
          onClick={handleClick}
          className={`circle microphone-${isPowerOn ? 'on shiny-btn' : 'off'}`}>
@@ -19,7 +19,7 @@ function MicrophoneSwitch(props) {
     <div id="heartbeat" className={`circle ${isPowerOn ? 'heartbeat' : ''}`}></div>
 
     <style jsx>{styles}</style>
-  </>)
+  </div>)
 }
 
 export default MicrophoneSwitch;
