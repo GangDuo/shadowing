@@ -5,6 +5,7 @@ import styles from './AppStyles';
 import MicrophoneSwitch from './components/MicrophoneSwitch';
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faMicrophone, faPlayCircle, faStopCircle } from '@fortawesome/free-solid-svg-icons'
+import moment from 'moment';
 
 library.add(faMicrophone, faPlayCircle, faStopCircle)
 
@@ -179,6 +180,13 @@ function App() {
       .map((x, i) => <p key={i}>{x}</p>)
   }
 
+  const downloadLogFile = () => {
+    const a = document.createElement('a');
+    a.href = 'data:text/plain,' + encodeURIComponent(finalTranscript);
+    a.download = `log${moment().format('_YYYYMMDD_HHmmss')}.txt`;
+    a.click();
+  }
+
   return (
     <div className="app">
       <div id="results">
@@ -199,6 +207,10 @@ function App() {
             .map((x ,i) => <option key={i} value={x[0]}>{x[1]||''}</option>)
         }
         </select>
+      </div>
+
+      <div>
+        <input type="button" value="ログをダウンロード" onClick={downloadLogFile} />
       </div>
 
       <MicrophoneSwitch isPowerOn={isPowerOn}
