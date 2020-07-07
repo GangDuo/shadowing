@@ -6,9 +6,9 @@ import MicrophoneSwitch from './components/MicrophoneSwitch';
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faMicrophone, faPlayCircle, faStopCircle, faVolumeUp, faTimes } from '@fortawesome/free-solid-svg-icons'
 import { faCircle } from '@fortawesome/free-regular-svg-icons';
-import moment from 'moment';
 import NativeSpeaker from './components/NativeSpeaker';
 import { CorrectSign, IncorrectSign } from './components/app-icons';
+import ButtonToConvertToTextFileThenDownload from './components/ButtonToConvertToTextFileThenDownload';
 
 library.add(faMicrophone, faPlayCircle, faStopCircle, faVolumeUp, faCircle, faTimes)
 
@@ -198,13 +198,6 @@ function App() {
       .map((x, i) => <p key={i}>{x}</p>)
   }
 
-  const downloadLogFile = () => {
-    const a = document.createElement('a');
-    a.href = 'data:text/plain,' + encodeURIComponent(finalTranscript);
-    a.download = `log${moment().format('_YYYYMMDD_HHmmss')}.txt`;
-    a.click();
-  }
-
   const judgment = (_ => {
     const phrases = speechLog.current.split('\n').filter(x => x.length > 0)
     if(phrases.length > 0) {
@@ -257,7 +250,11 @@ function App() {
         <MicrophoneSwitch isPowerOn={isPowerOn}
                           onClick={() => {setIsPowerOn(!isPowerOn)}} />
 
-        <div><input type="button" value="ログをダウンロード" onClick={downloadLogFile} /></div>
+        <div>
+          <ButtonToConvertToTextFileThenDownload text={finalTranscript}>
+            ログをダウンロード
+          </ButtonToConvertToTextFileThenDownload>
+        </div>
       </div>
       <style jsx>{styles}</style>
     </div>
