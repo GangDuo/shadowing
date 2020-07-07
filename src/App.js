@@ -4,10 +4,13 @@ import SpeechDaemon from './SpeechDaemon';
 import styles from './AppStyles';
 import MicrophoneSwitch from './components/MicrophoneSwitch';
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faMicrophone, faPlayCircle, faStopCircle } from '@fortawesome/free-solid-svg-icons'
+import { faMicrophone, faPlayCircle, faStopCircle, faVolumeUp, faTimes } from '@fortawesome/free-solid-svg-icons'
+import { faCircle } from '@fortawesome/free-regular-svg-icons';
 import moment from 'moment';
+import NativeSpeaker from './components/NativeSpeaker';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
-library.add(faMicrophone, faPlayCircle, faStopCircle)
+library.add(faMicrophone, faPlayCircle, faStopCircle, faVolumeUp, faCircle, faTimes)
 
 var langs =
 [['Afrikaans',       ['af-ZA']],
@@ -120,6 +123,9 @@ function App() {
   const [finalTranscript, setFinalTranscript] = useState('');
   const [interimTranscript, setInterimTranscript] = useState('');
   const [isPowerOn, setIsPowerOn] = useState(false);
+  const [voices, setVoices] = useState([]);
+  const [selectedVoice, setSelectedVoice] = useState();
+  const [sentence, setSentence] = useState("お手本にする文を入力しましょう！");
 
   const updateCountry = e => {
     speech.current.lang = langs[e.target.value][1][0]
@@ -164,6 +170,18 @@ function App() {
 
   useEffect(initialize, [])
 
+  useEffect(speechSynthesis.onvoiceschanged = e => {
+    console.log('onvoiceschanged')
+    const voices = speechSynthesis.getVoices()
+      // 日本語と英語以外の声は選択肢に追加しない。
+      .filter(voice => voice.lang.match('ja|en-US'))
+      //.filter(voice => voice.lang.match('en-US') && /^google/i.test(voice.name))
+      .reverse()
+    const defautVoice = voices.filter(voice => voice.lang.match('en-US') && /^google/i.test(voice.name))[0]
+    defautVoice && setSelectedVoice(defautVoice)
+    setVoices(voices)
+  }, [])
+
   if(isPowerOn) {
     console.log('Microphone On')
     speech.current.lang = dialect
@@ -187,8 +205,34 @@ function App() {
     a.click();
   }
 
+  const judgment = (_ => {
+    const phrases = speechLog.current.split('\n').filter(x => x.length > 0)
+    if(phrases.length > 0) {
+      return phrases.pop().replace(/\s/g, '').indexOf(sentence.replace(/\s/g, '').toLowerCase()) !== -1 ?
+      　<FontAwesomeIcon icon={['far', 'circle']} size="2x" color="green" /> :
+        <FontAwesomeIcon icon="times" size="2x" color="red" />
+    } else {
+      return (<></>)
+    }
+  })()
+
+  if(!selectedVoice) {
+    return (<>音声取得中</>)
+  }
+
   return (
     <div className="app">
+      <h1>英語の歌詞を正しく発音しているか判定します</h1>
+      <h2>お手本</h2>
+      <NativeSpeaker sentence={sentence}
+        selectedVoice={selectedVoice}
+        voices={voices}
+        onChangedSentence={e => setSentence(e.target.value)}
+        onChangeVoice={e => setSelectedVoice(e.target.value)} />
+
+      {judgment}
+
+      <h2>発音確認</h2>
       <div id="results">
         <span className="final" id="final_span">{latelyTranscript(10)}</span>
         <span className="interim" id="interim_span" style={{color: "gray"}}>{interimTranscript}</span>
