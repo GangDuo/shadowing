@@ -8,7 +8,7 @@ import { faMicrophone, faPlayCircle, faStopCircle, faVolumeUp, faTimes } from '@
 import { faCircle } from '@fortawesome/free-regular-svg-icons';
 import moment from 'moment';
 import NativeSpeaker from './components/NativeSpeaker';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { CorrectSign, IncorrectSign } from './components/app-icons';
 
 library.add(faMicrophone, faPlayCircle, faStopCircle, faVolumeUp, faCircle, faTimes)
 
@@ -209,8 +209,8 @@ function App() {
     const phrases = speechLog.current.split('\n').filter(x => x.length > 0)
     if(phrases.length > 0) {
       return phrases.pop().replace(/\s/g, '').indexOf(sentence.replace(/\s/g, '').toLowerCase()) !== -1 ?
-      　<FontAwesomeIcon icon={['far', 'circle']} size="2x" color="green" /> :
-        <FontAwesomeIcon icon="times" size="2x" color="red" />
+      　<CorrectSign /> :
+        <IncorrectSign />
     } else {
       return (<></>)
     }

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { VolumeUpSign } from './app-icons';
 
 function NativeSpeaker(props) {
   const [histories, setHistories] = useState([]);
@@ -21,7 +21,7 @@ function NativeSpeaker(props) {
         const uttr = new SpeechSynthesisUtterance(sentence)
         uttr.voice = selectedVoice
         speechSynthesis.speak(uttr)
-      }}><FontAwesomeIcon icon="volume-up" size="2x" /></button>
+      }}><VolumeUpSign /></button>
       {/*
       <button onClick={_ => speechSynthesis.pause()}>一時停止</button>
       <button onClick={_ => speechSynthesis.resume()}>再開</button>
