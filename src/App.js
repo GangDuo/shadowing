@@ -201,7 +201,7 @@ function App() {
   const judgment = (_ => {
     const phrases = speechLog.current.split('\n').filter(x => x.length > 0)
     if(phrases.length > 0) {
-      return phrases.pop().replace(/\s/g, '').indexOf(sentence.replace(/\s/g, '').toLowerCase()) !== -1 ?
+      return phrases.pop().replace(/\s/g, '').indexOf(sentence.replace(/[\s,\.]/g, '').toLowerCase()) !== -1 ?
       　<CorrectSign /> :
         <IncorrectSign />
     } else {
