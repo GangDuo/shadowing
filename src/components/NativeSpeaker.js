@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { VolumeUpSign } from './app-icons';
 
 function NativeSpeaker(props) {
@@ -8,16 +8,23 @@ function NativeSpeaker(props) {
     sentence, selectedVoice, voices
   } = props
 
+  useEffect(_ => {
+    const histories = JSON.parse(localStorage.getItem("histories"))
+    if(!histories) return
+    setHistories(histories)
+  }, [])
+
   return (
     <div>
       <input className="text"
              value={sentence} onChange={onChangedSentence} />
       <button onClick={_ => {
+        let sentences = [sentence, ...histories]
         if(histories.includes(sentence)) {
-          setHistories([sentence, ...histories.filter(x => x !== sentence)])
-        } else {
-          setHistories([sentence, ...histories])
+          sentences = [sentence, ...histories.filter(x => x !== sentence)]
         }
+        setHistories(sentences)
+        window.localStorage.setItem('histories', JSON.stringify(sentences))
         const uttr = new SpeechSynthesisUtterance(sentence)
         uttr.voice = selectedVoice
         speechSynthesis.speak(uttr)
