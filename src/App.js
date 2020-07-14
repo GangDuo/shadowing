@@ -146,7 +146,7 @@ const indexOfLangsByLocale = (locale) => {
 
 function App() {
   const speechLog = useRef('');
-  const speech = useRef(new SpeechDaemon());
+  const speech = useRef();
   const [selectedIndex, setSelectedIndex] = useState(null);
   const [dialect, setDialect] = useState();
   const [finalTranscript, setFinalTranscript] = useState('');
@@ -154,10 +154,18 @@ function App() {
   const [isPowerOn, setIsPowerOn] = useState(false);
   const [voices, setVoices] = useState([]);
   const [selectedVoice, setSelectedVoice] = useState(null);
-  const [sentence, setSentence] = useState("お手本にする文を入力しましょう！");
+  const [sentence, setSentence] = useState("Enter the example sentence!");
 
+  const setDefautVoice = () => {
+    // 日本語と英語以外の声は選択肢に追加しない。
+    const voices = getVoices(voice => voice.lang.match('ja|en[-_]US')).reverse()
+    const defautVoice = voices.filter(voice => voice.lang.match('en[-_]US') /*&& /^google/i.test(voice.name)*/)[0]
+    defautVoice && setSelectedVoice(defautVoice)
+    setVoices(voices)
+  }
   const initialize = _ => {
     console.log('初期化処理')
+    speech.current = new SpeechDaemon()
     speech.current.on('result', (event) => {
       let transcript = ''
       let buf = ''
@@ -188,33 +196,27 @@ function App() {
       console.log('エラー: ' + event.error)
     })
 
-    speechSynthesis.onvoiceschanged = e => {
+    window.speechSynthesis.onvoiceschanged = _ => {
       console.log('onvoiceschanged')
-      // 日本語と英語以外の声は選択肢に追加しない。
-      const voices = getVoices(voice => voice.lang.match('ja|en-US')).reverse()
-      const defautVoice = voices.filter(voice => voice.lang.match('en-US') && /^google/i.test(voice.name))[0]
-      defautVoice && setSelectedVoice(defautVoice)
-      setVoices(voices)
+      setDefautVoice()
     }
+    setDefautVoice()
   }
-
+  
   useEffect(initialize, [])
 
   useEffect(_ => {
     console.log('changed selectedVoice')
     if(!selectedVoice) return
 
-    setSelectedIndex(indexOfLangsByLocale(selectedVoice.lang))    
-  }, [selectedVoice])
+    const i = indexOfLangsByLocale(selectedVoice.lang.replace('_', '-'))
+    setSelectedIndex(i)
 
-  useEffect(_ => {
-    if(!selectedIndex) return
-
-    setDialect(langs[selectedIndex].filter((a, j) => j > 0).reduce((xs, x) => {
-      if(x[0] === selectedVoice.lang) xs = x
+    setDialect(langs[i].filter((a, j) => j > 0).reduce((xs, x) => {
+      if(x[0] === selectedVoice.lang.replace('_', '-')) xs = x
       return xs
     })[0])
-  }, [selectedIndex])
+  }, [selectedVoice])
 
   if(!selectedVoice || !selectedIndex) {
     console.log('音声取得中')

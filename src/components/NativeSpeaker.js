@@ -27,6 +27,7 @@ function NativeSpeaker(props) {
         window.localStorage.setItem('histories', JSON.stringify(sentences))
         const uttr = new SpeechSynthesisUtterance(sentence)
         uttr.voice = selectedVoice
+        uttr.lang = selectedVoice.lang.replace('_', '-')// for Android
         speechSynthesis.speak(uttr)
       }}><VolumeUpSign /></button>
       {/*

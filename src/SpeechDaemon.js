@@ -2,7 +2,7 @@ import {EventEmitter} from 'events';
 
 export default class SpeechDaemon extends EventEmitter {
   get lang() { return this.lang_ }
-  set lang(v) { this.lang_ = v }
+  set lang(v) { this.lang_ = v.replace('_', '-') }// for Android
 
   constructor(options) {
     super()
