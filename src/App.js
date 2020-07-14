@@ -143,6 +143,7 @@ const indexOfLangsByLocale = (locale) => {
     return ax
   }, null)
 }
+const isAndroid = () => /(android)/i.test(navigator.userAgent)
 
 function App() {
   const speechLog = useRef('');
@@ -171,7 +172,7 @@ function App() {
       let buf = ''
       for (let i = event.resultIndex; i < event.results.length; i++) {
         transcript = event.results[i][0].transcript;
-        if (event.results[i].isFinal) {
+        if (event.results[i].isFinal && (!isAndroid() || event.results[i][0].confidence > 0)) {
           if (speech.current.lang === 'ja-JP') {
             transcript += '。';
           }
