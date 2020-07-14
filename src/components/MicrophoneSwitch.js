@@ -1,6 +1,6 @@
 import React from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import styles from './MicrophoneSwitchStyles';
+import { MicrophoneSign } from './app-icons';
 
 function MicrophoneSwitch(props) {
   const { isPowerOn, onClick } = props
@@ -14,7 +14,7 @@ function MicrophoneSwitch(props) {
     <div id="microphone"
          onClick={handleClick}
          className={`circle microphone-${isPowerOn ? 'on shiny-btn' : 'off'}`}>
-      <div><FontAwesomeIcon icon="microphone" size="2x" /></div>
+      <div><MicrophoneSign /></div>
     </div>
     <div id="heartbeat" className={`circle ${isPowerOn ? 'heartbeat' : ''}`}></div>
 

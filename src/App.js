@@ -4,10 +4,13 @@ import SpeechDaemon from './SpeechDaemon';
 import styles from './AppStyles';
 import MicrophoneSwitch from './components/MicrophoneSwitch';
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faMicrophone, faPlayCircle, faStopCircle } from '@fortawesome/free-solid-svg-icons'
-import moment from 'moment';
+import { faMicrophone, faPlayCircle, faStopCircle, faVolumeUp, faTimes } from '@fortawesome/free-solid-svg-icons'
+import { faCircle } from '@fortawesome/free-regular-svg-icons';
+import NativeSpeaker from './components/NativeSpeaker';
+import { CorrectSign, IncorrectSign } from './components/app-icons';
+import ButtonToConvertToTextFileThenDownload from './components/ButtonToConvertToTextFileThenDownload';
 
-library.add(faMicrophone, faPlayCircle, faStopCircle)
+library.add(faMicrophone, faPlayCircle, faStopCircle, faVolumeUp, faCircle, faTimes)
 
 var langs =
 [['Afrikaans',       ['af-ZA']],
@@ -112,22 +115,46 @@ var langs =
  ['हिन्दी',             ['hi-IN']],
  ['ภาษาไทย',         ['th-TH']]];
 
+if(!Array.prototype.skip) {
+  Array.prototype.skip = function(n) {
+    if(n < 1) return this
+    return this.filter((v, i) => i > (n - 1))
+  }  
+}
+
+const getVoices = (arg) => {
+  return window.speechSynthesis.getVoices().filter(arg || (voice => voice))
+}
+const getVoiceByName = (name) => {
+  return getVoices(voice => voice.name === name)[0]
+}
+const indexOfLangsByLocale = (locale) => {
+  return langs.reduce((ax, lang, i) => {
+    const exists = lang.skip(1).reduce((xs, x) => {
+      xs.push(x[0]);
+      return xs;
+    }, []).includes(locale)
+
+    
+    if(exists) {
+      ax = i
+      console.log(`exists ${i}`)
+    }
+    return ax
+  }, null)
+}
+
 function App() {
   const speechLog = useRef('');
   const speech = useRef(new SpeechDaemon());
-  const [selectedIndex, setSelectedIndex] = useState(57);
-  const [dialect, setDialect] = useState(langs[selectedIndex][1][0]);
+  const [selectedIndex, setSelectedIndex] = useState(null);
+  const [dialect, setDialect] = useState();
   const [finalTranscript, setFinalTranscript] = useState('');
   const [interimTranscript, setInterimTranscript] = useState('');
   const [isPowerOn, setIsPowerOn] = useState(false);
-
-  const updateCountry = e => {
-    speech.current.lang = langs[e.target.value][1][0]
-    speech.current.restart()
-
-    setSelectedIndex(e.target.value)
-    setDialect(speech.current.lang)
-  }
+  const [voices, setVoices] = useState([]);
+  const [selectedVoice, setSelectedVoice] = useState(null);
+  const [sentence, setSentence] = useState("お手本にする文を入力しましょう！");
 
   const initialize = _ => {
     console.log('初期化処理')
@@ -160,9 +187,41 @@ function App() {
     }).on('error', (event) => {
       console.log('エラー: ' + event.error)
     })
+
+    speechSynthesis.onvoiceschanged = e => {
+      console.log('onvoiceschanged')
+      // 日本語と英語以外の声は選択肢に追加しない。
+      const voices = getVoices(voice => voice.lang.match('ja|en-US')).reverse()
+      const defautVoice = voices.filter(voice => voice.lang.match('en-US') && /^google/i.test(voice.name))[0]
+      defautVoice && setSelectedVoice(defautVoice)
+      setVoices(voices)
+    }
   }
 
   useEffect(initialize, [])
+
+  useEffect(_ => {
+    console.log('changed selectedVoice')
+    if(!selectedVoice) return
+
+    setSelectedIndex(indexOfLangsByLocale(selectedVoice.lang))    
+  }, [selectedVoice])
+
+  useEffect(_ => {
+    if(!selectedIndex) return
+
+    setDialect(langs[selectedIndex].filter((a, j) => j > 0).reduce((xs, x) => {
+      if(x[0] === selectedVoice.lang) xs = x
+      return xs
+    })[0])
+  }, [selectedIndex])
+
+  if(!selectedVoice || !selectedIndex) {
+    console.log('音声取得中')
+    return (<>音声取得中</>)
+  }
+
+  const hasDialect = langs[selectedIndex][1].length > 1
 
   if(isPowerOn) {
     console.log('Microphone On')
@@ -180,28 +239,48 @@ function App() {
       .map((x, i) => <p key={i}>{x}</p>)
   }
 
-  const downloadLogFile = () => {
-    const a = document.createElement('a');
-    a.href = 'data:text/plain,' + encodeURIComponent(finalTranscript);
-    a.download = `log${moment().format('_YYYYMMDD_HHmmss')}.txt`;
-    a.click();
-  }
+  const judgment = (_ => {
+    const phrases = speechLog.current.split('\n').filter(x => x.length > 0)
+    if(phrases.length > 0) {
+      return phrases.pop().replace(/\s/g, '').indexOf(sentence.replace(/[\s,\.]/g, '').toLowerCase()) !== -1 ?
+      　<CorrectSign /> :
+        <IncorrectSign />
+    } else {
+      return (<></>)
+    }
+  })()
 
   return (
     <div className="app">
+      <h1>英語の歌詞を正しく発音しているか判定します</h1>
+      <h2>お手本</h2>
+      <NativeSpeaker sentence={sentence}
+        selectedVoice={selectedVoice}
+        voices={voices}
+        onChangedSentence={e => setSentence(e.target.value)}
+        onChangeVoice={e => {
+          const voice = getVoiceByName(e.target.value)
+          setSelectedVoice(voice)
+          speech.current.lang = voice.lang
+          speech.current.restart()
+        }} />
+
+      {judgment}
+
+      <h2>発音確認</h2>
       <div id="results">
         <span className="final" id="final_span">{latelyTranscript(10)}</span>
         <span className="interim" id="interim_span" style={{color: "gray"}}>{interimTranscript}</span>
       </div>
 
       <div className="tools">
-        <div className="compact marquee" id="div_language">
-          <select id="select_language" value={selectedIndex} onChange={updateCountry}>
+        <div>
+          <select disabled={true} value={selectedIndex}>
           {
             langs.map((x, i) => <option key={x[0]} value={i}>{x[0]}</option>)
           }
           </select>&nbsp;&nbsp; 
-          <select id="select_dialect" style={{visibility: langs[selectedIndex][1].length === 1 ? 'hidden' : 'visible'}}>
+          <select disabled={true} value={dialect} style={{visibility: hasDialect ? 'visible' : 'hidden'}}>
           {
             langs[selectedIndex]
               .filter((x, i) => i > 0)
@@ -213,7 +292,11 @@ function App() {
         <MicrophoneSwitch isPowerOn={isPowerOn}
                           onClick={() => {setIsPowerOn(!isPowerOn)}} />
 
-        <div><input type="button" value="ログをダウンロード" onClick={downloadLogFile} /></div>
+        <div>
+          <ButtonToConvertToTextFileThenDownload text={finalTranscript}>
+            ログをダウンロード
+          </ButtonToConvertToTextFileThenDownload>
+        </div>
       </div>
       <style jsx>{styles}</style>
     </div>
