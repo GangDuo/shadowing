@@ -5,7 +5,9 @@ function NativeSpeaker(props) {
   const [histories, setHistories] = useState([]);
   const {
     onChangedSentence, onChangeVoice,
-    sentence, selectedVoice, voices
+    sentence, selectedVoice, voices,
+    rate, onChangedRate,
+    volume, onChangedVolume
   } = props
 
   useEffect(_ => {
@@ -28,12 +30,21 @@ function NativeSpeaker(props) {
         const uttr = new SpeechSynthesisUtterance(sentence)
         uttr.voice = selectedVoice
         uttr.lang = selectedVoice.lang.replace('_', '-')// for Android
+        if(rate && (rate >= 0.1 && rate <= 10)) {
+          uttr.rate = rate
+        }
+        if(volume && (volume >= 0 && volume <= 1)) {
+          uttr.volume = volume
+        }
         speechSynthesis.speak(uttr)
       }}><VolumeUpSign /></button>
       {/*
       <button onClick={_ => speechSynthesis.pause()}>一時停止</button>
       <button onClick={_ => speechSynthesis.resume()}>再開</button>
       */}
+
+      <div>速度×{rate}<input type="range" min="0.1" max="10.0" step="0.1" value={rate} onChange={onChangedRate} /></div>
+      <div>音量×{volume}<input type="range" min="0" max="1" step="0.1" value={volume} onChange={onChangedVolume} /></div>
 
       <select value={selectedVoice.name}
               onChange={onChangeVoice}>

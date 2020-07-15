@@ -156,6 +156,8 @@ function App() {
   const [voices, setVoices] = useState([]);
   const [selectedVoice, setSelectedVoice] = useState(null);
   const [sentence, setSentence] = useState("Enter the example sentence!");
+  const [rate, setRate] = useState(1);
+  const [volume, setVolume] = useState(1);
 
   const setDefautVoice = () => {
     // 日本語と英語以外の声は選択肢に追加しない。
@@ -266,7 +268,9 @@ function App() {
           setSelectedVoice(voice)
           speech.current.lang = voice.lang
           speech.current.restart()
-        }} />
+        }}
+        rate={rate} onChangedRate={e => setRate(e.target.value)}
+        volume={volume} onChangedVolume={e => setVolume(e.target.value)} />
 
       {judgment}
 
