@@ -247,9 +247,9 @@ function App() {
   const judgment = (_ => {
     const phrases = speechLog.current.split('\n').filter(x => x.length > 0)
     if(phrases.length > 0) {
-      return phrases.pop().replace(/\s/g, '').indexOf(sentence.replace(/[\s,\.]/g, '').toLowerCase()) !== -1 ?
-      　<CorrectSign /> :
-        <IncorrectSign />
+      const pattern = new RegExp(/[\s!,\.、。]/, 'g')
+      const [actual, expected] = [phrases.pop(), sentence].map(x => x.replace(pattern, '').toLowerCase())
+      return (actual === expected) ? <CorrectSign /> : <IncorrectSign />
     } else {
       return (<></>)
     }
