@@ -59,7 +59,7 @@ function NativeSpeaker(props) {
       <div>
         <label htmlFor="histories">履歴</label>
         <select id="histories" size="5"
-                onClick={e => {e.target.value && onChangedSentence && onChangedSentence(e)}}>
+                onChange={e => {e.target.value && onChangedSentence && onChangedSentence(e)}}>
           {histories.map((x, i) => <option key={i} value={x}>{x}</option>)}
         </select>
       </div>
