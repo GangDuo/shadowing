@@ -6,11 +6,12 @@ import MicrophoneSwitch from './components/MicrophoneSwitch';
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faMicrophone, faPlayCircle, faStopCircle, faVolumeUp, faTimes } from '@fortawesome/free-solid-svg-icons'
 import { faCircle } from '@fortawesome/free-regular-svg-icons';
+import { faWindows, faApple, faAndroid } from '@fortawesome/free-brands-svg-icons';
 import NativeSpeaker from './components/NativeSpeaker';
-import { CorrectSign, IncorrectSign } from './components/app-icons';
+import { CorrectSign, IncorrectSign, WindowsSign, AppleSign, AndroidSign } from './components/app-icons';
 import ButtonToConvertToTextFileThenDownload from './components/ButtonToConvertToTextFileThenDownload';
 
-library.add(faMicrophone, faPlayCircle, faStopCircle, faVolumeUp, faCircle, faTimes)
+library.add(faMicrophone, faPlayCircle, faStopCircle, faVolumeUp, faCircle, faTimes, faWindows, faApple, faAndroid)
 
 var langs =
 [['Afrikaans',       ['af-ZA']],
@@ -305,6 +306,48 @@ function App() {
           </ButtonToConvertToTextFileThenDownload>
         </div>
       </div>
+
+      <h2>よくある質問</h2>
+      <h3>使用方法を教えて？</h3>
+      <ol className="text-left">
+        <li>例文を入力しましょう。</li>
+        <li>スピーカーアイコンをタップして、発音を聞きます。</li>
+        <li>マイクアイコンをタップして、マイクONにします。</li>
+        <li>聞こえたとおりに喋ってみましょう。</li>
+      </ol>
+
+      <h3>動作しないけど...</h3>
+      Chromeブラウザで動作します。
+      <table className="qa">
+        <thead>
+          <tr>
+            <th colSpan="2">対応デバイス</th>
+            <th>可否</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><WindowsSign/></td>
+            <td className="text-left">PC</td>
+            <td><CorrectSign/></td>
+          </tr>
+          <tr>
+            <td><AndroidSign/></td>
+            <td className="text-left">Android</td>
+            <td><CorrectSign/></td>
+          </tr>
+          <tr>
+            <td><AppleSign/></td>
+            <td className="text-left">iPhone</td>
+            <td><IncorrectSign/></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <style jsx>{`
+      .qa {margin: 10px auto;}
+      .text-left {text-align: left;}
+      `}</style>
       <style jsx>{styles}</style>
     </div>
   );

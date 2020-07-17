@@ -16,3 +16,15 @@ export function MicrophoneSign(props) {
 export function VolumeUpSign(props) {
   return <FontAwesomeIcon icon="volume-up" size="2x" />
 }
+
+export function WindowsSign(props) {
+  return <FontAwesomeIcon icon={['fab', 'windows']} size="2x" />
+}
+
+export function AppleSign(props) {
+  return <FontAwesomeIcon icon={['fab', 'apple']} size="2x" />
+}
+
+export function AndroidSign(props) {
+  return <FontAwesomeIcon icon={['fab', 'android']} size="2x" />
+}
