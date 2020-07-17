@@ -156,7 +156,7 @@ function App() {
   const [isPowerOn, setIsPowerOn] = useState(false);
   const [voices, setVoices] = useState([]);
   const [selectedVoice, setSelectedVoice] = useState(null);
-  const [sentence, setSentence] = useState("Enter the example sentence!");
+  const [sentence, setSentence] = useState("I'm going to make him an offer he can't refuse.");
   const [rate, setRate] = useState(1);
   const [volume, setVolume] = useState(1);
 
@@ -248,7 +248,7 @@ function App() {
   const judgment = (_ => {
     const phrases = speechLog.current.split('\n').filter(x => x.length > 0)
     if(phrases.length > 0) {
-      const pattern = new RegExp(/[\s!,\.、。]/, 'g')
+      const pattern = new RegExp(/[\s!',\.、。]/, 'g')
       const [actual, expected] = [phrases.pop(), sentence].map(x => x.replace(pattern, '').toLowerCase())
       return (actual === expected) ? <CorrectSign /> : <IncorrectSign />
     } else {
@@ -258,7 +258,7 @@ function App() {
 
   return (
     <div className="app">
-      <h1>英語の歌詞を正しく発音しているか判定します</h1>
+      <h1>ドラマ・映画の名言をシャドーイング</h1>
       <h2>お手本</h2>
       <NativeSpeaker sentence={sentence}
         selectedVoice={selectedVoice}
@@ -310,10 +310,10 @@ function App() {
       <h2>よくある質問</h2>
       <h3>使用方法を教えて？</h3>
       <ol className="text-left">
-        <li>例文を入力しましょう。</li>
+        <li>ドラマ・映画の名言を入力しましょう。</li>
         <li>スピーカーアイコンをタップして、発音を聞きます。</li>
         <li>マイクアイコンをタップして、マイクONにします。</li>
-        <li>聞こえたとおりに喋ってみましょう。</li>
+        <li>役者になったつもりで、聞こえたとおりに喋ってみましょう。</li>
       </ol>
 
       <h3>動作しないけど...</h3>
