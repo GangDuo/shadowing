@@ -28,3 +28,7 @@ export function AppleSign(props) {
 export function AndroidSign(props) {
   return <FontAwesomeIcon icon={['fab', 'android']} size="2x" />
 }
+
+export function GithubSign(props) {
+  return <FontAwesomeIcon icon={['fab', 'github']} size="2x" />
+}

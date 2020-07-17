@@ -17,6 +17,14 @@ const styles = css`
   display: flex;
   justify-content: space-between;
 }
+
+.qa {margin: 10px auto;}
+.text-left {text-align: left;}
+.footer a {
+  cursor: pointer;
+  color: black;
+  text-decoration: none;
+}
 `
 
 export default styles

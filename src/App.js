@@ -6,12 +6,12 @@ import MicrophoneSwitch from './components/MicrophoneSwitch';
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faMicrophone, faPlayCircle, faStopCircle, faVolumeUp, faTimes } from '@fortawesome/free-solid-svg-icons'
 import { faCircle } from '@fortawesome/free-regular-svg-icons';
-import { faWindows, faApple, faAndroid } from '@fortawesome/free-brands-svg-icons';
+import { faWindows, faApple, faAndroid, faGithub } from '@fortawesome/free-brands-svg-icons';
 import NativeSpeaker from './components/NativeSpeaker';
-import { CorrectSign, IncorrectSign, WindowsSign, AppleSign, AndroidSign } from './components/app-icons';
+import { CorrectSign, IncorrectSign, WindowsSign, AppleSign, AndroidSign, GithubSign } from './components/app-icons';
 import ButtonToConvertToTextFileThenDownload from './components/ButtonToConvertToTextFileThenDownload';
 
-library.add(faMicrophone, faPlayCircle, faStopCircle, faVolumeUp, faCircle, faTimes, faWindows, faApple, faAndroid)
+library.add(faMicrophone, faPlayCircle, faStopCircle, faVolumeUp, faCircle, faTimes, faWindows, faApple, faAndroid, faGithub)
 
 var langs =
 [['Afrikaans',       ['af-ZA']],
@@ -344,10 +344,12 @@ function App() {
         </tbody>
       </table>
 
-      <style jsx>{`
-      .qa {margin: 10px auto;}
-      .text-left {text-align: left;}
-      `}</style>
+      <hr/>
+
+      <div className="footer">
+        <a target="_blank" href="https://github.com/GangDuo/shadowing"><GithubSign />GitHub</a>
+      </div>
+
       <style jsx>{styles}</style>
     </div>
   );
