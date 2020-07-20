@@ -11,6 +11,7 @@ import NativeSpeaker from './components/NativeSpeaker';
 import { CorrectSign, IncorrectSign, WindowsSign, AppleSign, AndroidSign, GithubSign } from './components/app-icons';
 import ButtonToConvertToTextFileThenDownload from './components/ButtonToConvertToTextFileThenDownload';
 import { Typography , Grid} from '@material-ui/core';
+import InterimTranscript from './components/InterimTranscript';
 
 library.add(faMicrophone, faPlayCircle, faStopCircle, faVolumeUp, faCircle, faTimes, faWindows, faApple, faAndroid, faGithub)
 
@@ -266,7 +267,7 @@ function App() {
       <div className="recognition">
         <div id="results">
           <span className="final" id="final_span">{latelyTranscript(5)}</span>
-          <span className="interim" id="interim_span" style={{color: "gray"}}>{interimTranscript}</span>
+          <InterimTranscript>{interimTranscript}</InterimTranscript>
         </div>
         <div className="tools">
           <Grid container direction="column" justify="space-around" alignItems="center">
