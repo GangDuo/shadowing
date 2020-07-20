@@ -54,15 +54,15 @@ const styles = css`
 
 .microphone-on {
   background: #1373C7;
-  width: 80px;
-  height: 80px;
+  width: 48px;
+  height: 48px;
   color: #FFF;
 }
 
 .microphone-off {
   background: #FFF;
-  width: 70px;
-  height: 70px;
+  width: 38px;
+  height: 38px;
   border: solid 5px #ED1C22;
   color: #1373C7;
 }
@@ -75,8 +75,8 @@ const styles = css`
   opacity: 0.2;
   z-index: -99;
   background: #1373C7;
-  width: 80px;
-  height: 80px;
+  width: 48px;
+  height: 48px;
 }
 
 @keyframes pounding {

@@ -13,9 +13,14 @@ const styles = css`
   min-height: 100px;
 }
 
+.recognition {position: relative;}
+
 .tools {
   display: flex;
   justify-content: space-between;
+  position: absolute;
+  top: 0;
+  right: 0;
 }
 
 .qa {margin: 10px auto;}

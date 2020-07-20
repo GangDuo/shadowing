@@ -14,7 +14,7 @@ export function MicrophoneSign(props) {
 }
 
 export function VolumeUpSign(props) {
-  return <FontAwesomeIcon icon="volume-up" size="2x" />
+  return <FontAwesomeIcon icon="volume-up" size="1x" />
 }
 
 export function WindowsSign(props) {
