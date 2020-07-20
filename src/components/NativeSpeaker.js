@@ -1,7 +1,27 @@
 import React, { useState, useEffect } from 'react';
+import { makeStyles } from '@material-ui/core/styles';
 import { VolumeUpSign } from './app-icons';
+import {Grid, Slider, Typography, FormControl, Select, InputLabel, MenuItem,
+   OutlinedInput, InputAdornment, IconButton } from '@material-ui/core';
+
+const useStyles = makeStyles({
+  root: {
+    height: "48px",
+    width: "48px",
+    borderRadius: "50%",
+    color: "#fff",
+    backgroundColor: "#1976d2",
+    border: 0,
+    cursor: "pointer",
+    "&:hover": {
+      color: "#fff",
+      backgroundColor: "#1976d2",
+    }
+  },
+});
 
 function NativeSpeaker(props) {
+  const classes = useStyles();
   const [histories, setHistories] = useState([]);
   const {
     onChangedSentence, onChangeVoice,
@@ -16,45 +36,92 @@ function NativeSpeaker(props) {
     setHistories(histories)
   }, [])
 
+  const handleSpeak = _ => {
+    let sentences = [sentence, ...histories]
+    if(histories.includes(sentence)) {
+      sentences = [sentence, ...histories.filter(x => x !== sentence)]
+    }
+    setHistories(sentences)
+    window.localStorage.setItem('histories', JSON.stringify(sentences))
+    const uttr = new SpeechSynthesisUtterance(sentence)
+    uttr.voice = selectedVoice
+    uttr.lang = selectedVoice.lang.replace('_', '-')// for Android
+    if(rate && (rate >= 0.1 && rate <= 10)) {
+      uttr.rate = rate
+    }
+    if(volume && (volume >= 0 && volume <= 1)) {
+      uttr.volume = volume
+    }
+    speechSynthesis.speak(uttr)
+  }
+
   return (
     <div>
-      <input className="text"
-             value={sentence} onChange={onChangedSentence} />
-      <button onClick={_ => {
-        let sentences = [sentence, ...histories]
-        if(histories.includes(sentence)) {
-          sentences = [sentence, ...histories.filter(x => x !== sentence)]
-        }
-        setHistories(sentences)
-        window.localStorage.setItem('histories', JSON.stringify(sentences))
-        const uttr = new SpeechSynthesisUtterance(sentence)
-        uttr.voice = selectedVoice
-        uttr.lang = selectedVoice.lang.replace('_', '-')// for Android
-        if(rate && (rate >= 0.1 && rate <= 10)) {
-          uttr.rate = rate
-        }
-        if(volume && (volume >= 0 && volume <= 1)) {
-          uttr.volume = volume
-        }
-        speechSynthesis.speak(uttr)
-      }}><VolumeUpSign /></button>
+      <FormControl required fullWidth variant="outlined">
+        <InputLabel htmlFor="outlined-adornment-sentence">台詞</InputLabel>
+        <OutlinedInput
+          id="outlined-adornment-sentence"
+          type='text'
+          labelWidth={50}
+          value={sentence}
+          onChange={onChangedSentence}
+          endAdornment={
+            <InputAdornment position="end">
+              <IconButton focusVisibleClassName={"a"} classes={{root: classes.root}} onClick={handleSpeak} size="small"><VolumeUpSign /></IconButton>
+            </InputAdornment>
+          }
+          
+        />
+      </FormControl>
       {/*
       <button onClick={_ => speechSynthesis.pause()}>一時停止</button>
       <button onClick={_ => speechSynthesis.resume()}>再開</button>
       */}
 
-      <div>速度×{rate}<input type="range" min="0.1" max="10.0" step="0.1" value={rate} onChange={onChangedRate} /></div>
-      <div>音量×{volume}<input type="range" min="0" max="1" step="0.1" value={volume} onChange={onChangedVolume} /></div>
+      <Grid container spacing={2} alignItems="center">
+        <Grid item>
+          <Typography id="input-slider" gutterBottom>速度</Typography>
+        </Grid>
+        <Grid item xs>
+          <Slider min={0.1} max={10.0} step={0.1} value={rate}
+                  onChange={onChangedRate}
+                  valueLabelDisplay="auto"
+                  aria-labelledby="input-slider" />
+        </Grid>
+        <Grid item><Typography>{rate}</Typography></Grid>
+      </Grid>
 
-      <select value={selectedVoice.name}
-              onChange={onChangeVoice}>
+      <Grid container spacing={2} alignItems="center">
+        <Grid item>
+          <Typography id="volume-slider" gutterBottom>音量</Typography>
+        </Grid>
+        <Grid item xs>
+          <Slider min={0} max={1} step={0.1} value={volume}
+                  onChange={onChangedVolume}
+                  valueLabelDisplay="auto"
+                  aria-labelledby="volume-slider" />
+        </Grid>
+        <Grid item><Typography>{volume}</Typography></Grid>
+      </Grid>
+
+      <FormControl className={"abc"/*classes.formControl*/}>
+        <InputLabel shrink id="selectVoicesLabel">
+          言語
+        </InputLabel>
+        <Select
+          labelId="selectVoicesLabel"
+          value={selectedVoice.name}
+          onChange={onChangeVoice}
+          displayEmpty
+        >
         {
           voices
           .map((voice, i) => {
-            return (<option key={i} value={voice.name}>{`${voice.name} (${voice.lang})`}</option>)
+            return (<MenuItem key={i} value={voice.name}>{`${voice.name} (${voice.lang})`}</MenuItem>)
           })            
         }
-      </select>
+        </Select>
+      </FormControl>
 
       <div>
         <label htmlFor="histories">履歴</label>
@@ -65,15 +132,6 @@ function NativeSpeaker(props) {
       </div>
 
       <style jsx>{`
-      button {
-        height: 30px;
-        width: 80px;
-      }
-      .text {
-        width: 80%;
-        height: 40px;
-        font-size: 32px;
-      }
       label {display: block;}
       #histories {width: 80%;}
       `}</style>

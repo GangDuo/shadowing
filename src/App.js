@@ -10,6 +10,7 @@ import { faWindows, faApple, faAndroid, faGithub } from '@fortawesome/free-brand
 import NativeSpeaker from './components/NativeSpeaker';
 import { CorrectSign, IncorrectSign, WindowsSign, AppleSign, AndroidSign, GithubSign } from './components/app-icons';
 import ButtonToConvertToTextFileThenDownload from './components/ButtonToConvertToTextFileThenDownload';
+import { Typography , Grid} from '@material-ui/core';
 
 library.add(faMicrophone, faPlayCircle, faStopCircle, faVolumeUp, faCircle, faTimes, faWindows, faApple, faAndroid, faGithub)
 
@@ -258,8 +259,49 @@ function App() {
 
   return (
     <div className="app">
-      <h1>ドラマ・映画の名言をシャドーイング</h1>
-      <h2>お手本</h2>
+      <Typography>ドラマ・映画の名言をシャドーイング</Typography>
+
+      {judgment}
+
+      <div className="recognition">
+        <div id="results">
+          <span className="final" id="final_span">{latelyTranscript(5)}</span>
+          <span className="interim" id="interim_span" style={{color: "gray"}}>{interimTranscript}</span>
+        </div>
+        <div className="tools">
+          <Grid container direction="column" justify="space-around" alignItems="center">
+            <Grid item>
+              <div style={{display: 'none'}}>
+                <select disabled={true} value={selectedIndex}>
+                {
+                  langs.map((x, i) => <option key={x[0]} value={i}>{x[0]}</option>)
+                }
+                </select>&nbsp;&nbsp; 
+                <select disabled={true} value={dialect} style={{visibility: hasDialect ? 'visible' : 'hidden'}}>
+                {
+                  langs[selectedIndex]
+                    .filter((x, i) => i > 0)
+                    .map((x ,i) => <option key={i} value={x[0]}>{x[1]||''}</option>)
+                }
+                </select>
+              </div>
+            </Grid>
+          
+            <Grid item>
+              <ButtonToConvertToTextFileThenDownload text={finalTranscript}>
+                ログをダウンロード
+              </ButtonToConvertToTextFileThenDownload>
+            </Grid>
+            <Grid item>
+              <div style={{padding: "10px"}}>
+              <MicrophoneSwitch isPowerOn={isPowerOn}
+                              onClick={() => {setIsPowerOn(!isPowerOn)}} />
+              </div>
+            </Grid>          
+          </Grid>
+        </div>
+      </div>
+      <br/>
       <NativeSpeaker sentence={sentence}
         selectedVoice={selectedVoice}
         voices={voices}
@@ -270,42 +312,8 @@ function App() {
           speech.current.lang = voice.lang
           speech.current.restart()
         }}
-        rate={rate} onChangedRate={e => setRate(e.target.value)}
-        volume={volume} onChangedVolume={e => setVolume(e.target.value)} />
-
-      {judgment}
-
-      <h2>発音確認</h2>
-      <div id="results">
-        <span className="final" id="final_span">{latelyTranscript(10)}</span>
-        <span className="interim" id="interim_span" style={{color: "gray"}}>{interimTranscript}</span>
-      </div>
-
-      <div className="tools">
-        <div>
-          <select disabled={true} value={selectedIndex}>
-          {
-            langs.map((x, i) => <option key={x[0]} value={i}>{x[0]}</option>)
-          }
-          </select>&nbsp;&nbsp; 
-          <select disabled={true} value={dialect} style={{visibility: hasDialect ? 'visible' : 'hidden'}}>
-          {
-            langs[selectedIndex]
-              .filter((x, i) => i > 0)
-              .map((x ,i) => <option key={i} value={x[0]}>{x[1]||''}</option>)
-          }
-          </select>
-        </div>
-
-        <MicrophoneSwitch isPowerOn={isPowerOn}
-                          onClick={() => {setIsPowerOn(!isPowerOn)}} />
-
-        <div>
-          <ButtonToConvertToTextFileThenDownload text={finalTranscript}>
-            ログをダウンロード
-          </ButtonToConvertToTextFileThenDownload>
-        </div>
-      </div>
+        rate={rate} onChangedRate={(e, newValue) => setRate(newValue)}
+        volume={volume} onChangedVolume={(e, newValue) => setVolume(newValue)} />
 
       <h2>よくある質問</h2>
       <h3>使用方法を教えて？</h3>
