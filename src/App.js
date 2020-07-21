@@ -12,6 +12,7 @@ import { CorrectSign, IncorrectSign, WindowsSign, AppleSign, AndroidSign, Github
 import ButtonToConvertToTextFileThenDownload from './components/ButtonToConvertToTextFileThenDownload';
 import { Typography , Grid} from '@material-ui/core';
 import InterimTranscript from './components/InterimTranscript';
+import StackHistory from './components/StackHistory';
 
 library.add(faMicrophone, faPlayCircle, faStopCircle, faVolumeUp, faCircle, faTimes, faWindows, faApple, faAndroid, faGithub)
 
@@ -161,6 +162,7 @@ function App() {
   const [sentence, setSentence] = useState("I'm going to make him an offer he can't refuse.");
   const [rate, setRate] = useState(1);
   const [volume, setVolume] = useState(1);
+  const [histories, setHistories] = useState([]);
 
   const setDefautVoice = () => {
     // 日本語と英語以外の声は選択肢に追加しない。
@@ -207,6 +209,10 @@ function App() {
       setDefautVoice()
     }
     setDefautVoice()
+
+    const histories = JSON.parse(localStorage.getItem("histories"))
+    if(!histories) return
+    setHistories(histories)
   }
   
   useEffect(initialize, [])
@@ -246,6 +252,8 @@ function App() {
       .slice(-1 * n)
       .map((x, i) => <p key={i}>{x}</p>)
   }
+
+  const handleChangedSentence = e => setSentence(e.target.value)
 
   const judgment = (_ => {
     const phrases = speechLog.current.split('\n').filter(x => x.length > 0)
@@ -306,15 +314,22 @@ function App() {
       <NativeSpeaker sentence={sentence}
         selectedVoice={selectedVoice}
         voices={voices}
-        onChangedSentence={e => setSentence(e.target.value)}
+        onChangedSentence={handleChangedSentence}
         onChangeVoice={e => {
           const voice = getVoiceByName(e.target.value)
           setSelectedVoice(voice)
           speech.current.lang = voice.lang
           speech.current.restart()
         }}
+        onSpeak={_ => {
+          let sentences = [sentence, ...histories.filter(x => x !== sentence)]
+          setHistories(sentences)
+          window.localStorage.setItem('histories', JSON.stringify(sentences))
+        }}
         rate={rate} onChangedRate={(e, newValue) => setRate(newValue)}
         volume={volume} onChangedVolume={(e, newValue) => setVolume(newValue)} />
+      <StackHistory histories={histories}
+        onChange={handleChangedSentence} />
 
       <h2>よくある質問</h2>
       <h3>使用方法を教えて？</h3>

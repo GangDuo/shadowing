@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { VolumeUpSign } from './app-icons';
 import {Grid, Slider, Typography, FormControl, Select, InputLabel, MenuItem,
@@ -22,27 +22,15 @@ const useStyles = makeStyles({
 
 function NativeSpeaker(props) {
   const classes = useStyles();
-  const [histories, setHistories] = useState([]);
   const {
-    onChangedSentence, onChangeVoice,
+    onChangedSentence, onChangeVoice, onSpeak,
     sentence, selectedVoice, voices,
     rate, onChangedRate,
     volume, onChangedVolume
   } = props
 
-  useEffect(_ => {
-    const histories = JSON.parse(localStorage.getItem("histories"))
-    if(!histories) return
-    setHistories(histories)
-  }, [])
-
   const handleSpeak = _ => {
-    let sentences = [sentence, ...histories]
-    if(histories.includes(sentence)) {
-      sentences = [sentence, ...histories.filter(x => x !== sentence)]
-    }
-    setHistories(sentences)
-    window.localStorage.setItem('histories', JSON.stringify(sentences))
+    onSpeak && onSpeak(sentence)
     const uttr = new SpeechSynthesisUtterance(sentence)
     uttr.voice = selectedVoice
     uttr.lang = selectedVoice.lang.replace('_', '-')// for Android
@@ -104,7 +92,7 @@ function NativeSpeaker(props) {
         <Grid item><Typography>{volume}</Typography></Grid>
       </Grid>
 
-      <FormControl className={"abc"/*classes.formControl*/}>
+      <FormControl>
         <InputLabel shrink id="selectVoicesLabel">
           言語
         </InputLabel>
@@ -122,19 +110,6 @@ function NativeSpeaker(props) {
         }
         </Select>
       </FormControl>
-
-      <div>
-        <label htmlFor="histories">履歴</label>
-        <select id="histories" size="5"
-                onChange={e => {e.target.value && onChangedSentence && onChangedSentence(e)}}>
-          {histories.map((x, i) => <option key={i} value={x}>{x}</option>)}
-        </select>
-      </div>
-
-      <style jsx>{`
-      label {display: block;}
-      #histories {width: 80%;}
-      `}</style>
     </div>
   )
 }
