@@ -10,7 +10,7 @@ import { faWindows, faApple, faAndroid, faGithub } from '@fortawesome/free-brand
 import NativeSpeaker from './components/NativeSpeaker';
 import { CorrectSign, IncorrectSign, WindowsSign, AppleSign, AndroidSign, GithubSign } from './components/app-icons';
 import ButtonToConvertToTextFileThenDownload from './components/ButtonToConvertToTextFileThenDownload';
-import { Typography , Grid} from '@material-ui/core';
+import { Typography , Grid, Tabs, Tab } from '@material-ui/core';
 import InterimTranscript from './components/InterimTranscript';
 import StackHistory from './components/StackHistory';
 
@@ -163,6 +163,7 @@ function App() {
   const [rate, setRate] = useState(1);
   const [volume, setVolume] = useState(1);
   const [histories, setHistories] = useState([]);
+  const [currentTab, setCurrentTab] = React.useState(0);
 
   const setDefautVoice = () => {
     // 日本語と英語以外の声は選択肢に追加しない。
@@ -270,6 +271,20 @@ function App() {
     <div className="app">
       <Typography>ドラマ・映画の名言をシャドーイング</Typography>
 
+      <Tabs
+        value={currentTab}
+        onChange={(event, newValue) => {
+          setCurrentTab(newValue);
+        }}
+        indicatorColor="primary"
+        textColor="primary"
+        centered
+      >
+        <Tab label="ホーム" />
+        <Tab label="過去の台詞" />
+      </Tabs>
+      {currentTab === 0 && (<>
+
       {judgment}
 
       <div className="recognition">
@@ -328,8 +343,11 @@ function App() {
         }}
         rate={rate} onChangedRate={(e, newValue) => setRate(newValue)}
         volume={volume} onChangedVolume={(e, newValue) => setVolume(newValue)} />
-      <StackHistory histories={histories}
-        onChange={handleChangedSentence} />
+      </>)}
+
+      {currentTab === 1 && (
+        <StackHistory histories={histories}
+          onChange={handleChangedSentence} />)}
 
       <h2>よくある質問</h2>
       <h3>使用方法を教えて？</h3>
