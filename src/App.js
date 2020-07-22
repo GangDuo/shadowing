@@ -4,16 +4,17 @@ import SpeechDaemon from './SpeechDaemon';
 import styles from './AppStyles';
 import MicrophoneSwitch from './components/MicrophoneSwitch';
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faMicrophone, faPlayCircle, faStopCircle, faVolumeUp, faTimes } from '@fortawesome/free-solid-svg-icons'
+import { faMicrophone, faPlayCircle, faStopCircle, faVolumeUp, faTimes, faTrash, faCircle as fasCircle } from '@fortawesome/free-solid-svg-icons'
 import { faCircle } from '@fortawesome/free-regular-svg-icons';
 import { faWindows, faApple, faAndroid, faGithub } from '@fortawesome/free-brands-svg-icons';
 import NativeSpeaker from './components/NativeSpeaker';
 import { CorrectSign, IncorrectSign, WindowsSign, AppleSign, AndroidSign, GithubSign } from './components/app-icons';
 import ButtonToConvertToTextFileThenDownload from './components/ButtonToConvertToTextFileThenDownload';
-import { Typography , Grid} from '@material-ui/core';
+import { Typography , Grid, Tabs, Tab } from '@material-ui/core';
 import InterimTranscript from './components/InterimTranscript';
+import StackHistory from './components/StackHistory';
 
-library.add(faMicrophone, faPlayCircle, faStopCircle, faVolumeUp, faCircle, faTimes, faWindows, faApple, faAndroid, faGithub)
+library.add(faMicrophone, faPlayCircle, faStopCircle, faVolumeUp, faCircle, fasCircle, faTimes, faWindows, faApple, faAndroid, faGithub, faTrash)
 
 var langs =
 [['Afrikaans',       ['af-ZA']],
@@ -148,6 +149,8 @@ const indexOfLangsByLocale = (locale) => {
 }
 const isAndroid = () => /(android)/i.test(navigator.userAgent)
 
+const saveHistories = x => window.localStorage.setItem('histories', JSON.stringify(x))
+
 function App() {
   const speechLog = useRef('');
   const speech = useRef();
@@ -161,6 +164,8 @@ function App() {
   const [sentence, setSentence] = useState("I'm going to make him an offer he can't refuse.");
   const [rate, setRate] = useState(1);
   const [volume, setVolume] = useState(1);
+  const [histories, setHistories] = useState([]);
+  const [currentTab, setCurrentTab] = React.useState(0);
 
   const setDefautVoice = () => {
     // 日本語と英語以外の声は選択肢に追加しない。
@@ -207,6 +212,17 @@ function App() {
       setDefautVoice()
     }
     setDefautVoice()
+
+    const histories = JSON.parse(localStorage.getItem("histories"))
+    /* 昔のフォーマットを新フォーマットへ変換 */
+    .map(x => {
+      if(typeof x === 'string') {
+        return { sentence: x }
+      }
+      return x
+    })
+    if(!histories) return
+    setHistories(histories)
   }
   
   useEffect(initialize, [])
@@ -247,6 +263,8 @@ function App() {
       .map((x, i) => <p key={i}>{x}</p>)
   }
 
+  const handleChangedSentence = e => setSentence(e.target.value)
+
   const judgment = (_ => {
     const phrases = speechLog.current.split('\n').filter(x => x.length > 0)
     if(phrases.length > 0) {
@@ -261,6 +279,20 @@ function App() {
   return (
     <div className="app">
       <Typography>ドラマ・映画の名言をシャドーイング</Typography>
+
+      <Tabs
+        value={currentTab}
+        onChange={(event, newValue) => {
+          setCurrentTab(newValue);
+        }}
+        indicatorColor="primary"
+        textColor="primary"
+        centered
+      >
+        <Tab label="ホーム" />
+        <Tab label="過去の台詞" />
+      </Tabs>
+      {currentTab === 0 && (<>
 
       {judgment}
 
@@ -306,15 +338,35 @@ function App() {
       <NativeSpeaker sentence={sentence}
         selectedVoice={selectedVoice}
         voices={voices}
-        onChangedSentence={e => setSentence(e.target.value)}
+        onChangedSentence={handleChangedSentence}
         onChangeVoice={e => {
           const voice = getVoiceByName(e.target.value)
           setSelectedVoice(voice)
           speech.current.lang = voice.lang
           speech.current.restart()
         }}
+        onSpeak={_ => {
+          let sentences = [{sentence}, ...histories.filter(x => x.sentence !== sentence)]
+          setHistories(sentences)
+          saveHistories(sentences)
+        }}
         rate={rate} onChangedRate={(e, newValue) => setRate(newValue)}
         volume={volume} onChangedVolume={(e, newValue) => setVolume(newValue)} />
+      </>)}
+
+      {currentTab === 1 && (
+        <StackHistory histories={histories}
+          toggleItemRemove={({checked, index}) => {
+            const items = histories.concat();
+            items[index].willRemove = checked
+            setHistories(items)
+          }}
+          onRemove={_ => {
+            const items = histories.filter(x => !x.willRemove).concat();
+            setHistories(items)
+            saveHistories(items)
+          }} 
+          onChange={handleChangedSentence} />)}
 
       <h2>よくある質問</h2>
       <h3>使用方法を教えて？</h3>
