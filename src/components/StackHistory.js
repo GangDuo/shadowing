@@ -1,25 +1,44 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { ListItem, ListItemText } from '@material-ui/core';
+import { FixedSizeList } from 'react-window';
+
+const NUMBER_OF_ROWS = 7
+
+const Row = ({ index, style, data }) => {
+  const { histories, selectedIndex, setSelectedIndex, onChange } = data;
+  const handleClick = _ => {
+    setSelectedIndex(index)
+    histories[index] && onChange && onChange({target:{value: histories[index]}})
+  }
+
+  return (
+    <ListItem button style={style} key={index} selected={selectedIndex === index} onClick={handleClick}>
+        <ListItemText primary={histories[index]} />
+    </ListItem>
+  )
+}
 
 export default function StackHistory(props) {
   const { title, histories, onChange, size } = props
+  const [selectedIndex, setSelectedIndex] = useState(null)
 
   return (
     <div>
-      <label htmlFor="histories">{title}</label>
-      <select id="histories" size={size}
-              onChange={e => {e.target.value && onChange && onChange(e)}}>
-        {histories.map((x, i) => <option key={i} value={x}>{x}</option>)}
-      </select>
-
-      <style jsx>{`
-      label {display: block;}
-      #histories {width: 80%;}
-      `}</style>
+      <p>{title}</p>
+      <FixedSizeList
+        height={size * NUMBER_OF_ROWS}
+        itemCount={histories.length}
+        itemSize={size}
+        width={"100%"}
+        itemData={{histories, selectedIndex, setSelectedIndex, onChange}}
+      >
+        {Row}
+      </FixedSizeList>
     </div>
   )
 }
 
 StackHistory.defaultProps = {
   title: '履歴',
-  size: 5,
+  size: 35,
 };
