@@ -4,7 +4,7 @@ import SpeechDaemon from './SpeechDaemon';
 import styles from './AppStyles';
 import MicrophoneSwitch from './components/MicrophoneSwitch';
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faMicrophone, faPlayCircle, faStopCircle, faVolumeUp, faTimes } from '@fortawesome/free-solid-svg-icons'
+import { faMicrophone, faPlayCircle, faStopCircle, faVolumeUp, faTimes, faTrash, faCircle as fasCircle } from '@fortawesome/free-solid-svg-icons'
 import { faCircle } from '@fortawesome/free-regular-svg-icons';
 import { faWindows, faApple, faAndroid, faGithub } from '@fortawesome/free-brands-svg-icons';
 import NativeSpeaker from './components/NativeSpeaker';
@@ -14,7 +14,7 @@ import { Typography , Grid, Tabs, Tab } from '@material-ui/core';
 import InterimTranscript from './components/InterimTranscript';
 import StackHistory from './components/StackHistory';
 
-library.add(faMicrophone, faPlayCircle, faStopCircle, faVolumeUp, faCircle, faTimes, faWindows, faApple, faAndroid, faGithub)
+library.add(faMicrophone, faPlayCircle, faStopCircle, faVolumeUp, faCircle, fasCircle, faTimes, faWindows, faApple, faAndroid, faGithub, faTrash)
 
 var langs =
 [['Afrikaans',       ['af-ZA']],
@@ -149,6 +149,8 @@ const indexOfLangsByLocale = (locale) => {
 }
 const isAndroid = () => /(android)/i.test(navigator.userAgent)
 
+const saveHistories = x => window.localStorage.setItem('histories', JSON.stringify(x))
+
 function App() {
   const speechLog = useRef('');
   const speech = useRef();
@@ -212,6 +214,13 @@ function App() {
     setDefautVoice()
 
     const histories = JSON.parse(localStorage.getItem("histories"))
+    /* 昔のフォーマットを新フォーマットへ変換 */
+    .map(x => {
+      if(typeof x === 'string') {
+        return { sentence: x }
+      }
+      return x
+    })
     if(!histories) return
     setHistories(histories)
   }
@@ -337,9 +346,9 @@ function App() {
           speech.current.restart()
         }}
         onSpeak={_ => {
-          let sentences = [sentence, ...histories.filter(x => x !== sentence)]
+          let sentences = [{sentence}, ...histories.filter(x => x.sentence !== sentence)]
           setHistories(sentences)
-          window.localStorage.setItem('histories', JSON.stringify(sentences))
+          saveHistories(sentences)
         }}
         rate={rate} onChangedRate={(e, newValue) => setRate(newValue)}
         volume={volume} onChangedVolume={(e, newValue) => setVolume(newValue)} />
@@ -347,6 +356,16 @@ function App() {
 
       {currentTab === 1 && (
         <StackHistory histories={histories}
+          toggleItemRemove={({checked, index}) => {
+            const items = histories.concat();
+            items[index].willRemove = checked
+            setHistories(items)
+          }}
+          onRemove={_ => {
+            const items = histories.filter(x => !x.willRemove).concat();
+            setHistories(items)
+            saveHistories(items)
+          }} 
           onChange={handleChangedSentence} />)}
 
       <h2>よくある質問</h2>

@@ -1,6 +1,10 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
+export function CircleSign(props) {
+  return <FontAwesomeIcon icon='circle' {...props} />
+}
+
 export function CorrectSign(props) {
   return <FontAwesomeIcon icon={['far', 'circle']} size="2x" color="green" />
 }
@@ -31,4 +35,8 @@ export function AndroidSign(props) {
 
 export function GithubSign(props) {
   return <FontAwesomeIcon icon={['fab', 'github']} size="2x" />
+}
+
+export function TrashSign(props) {
+  return <FontAwesomeIcon icon="trash" {...props} />
 }
