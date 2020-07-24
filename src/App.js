@@ -214,15 +214,14 @@ function App() {
     setDefautVoice()
 
     const histories = JSON.parse(localStorage.getItem("histories"))
+    if(!histories) return
     /* 昔のフォーマットを新フォーマットへ変換 */
-    .map(x => {
+    setHistories(histories.map(x => {
       if(typeof x === 'string') {
         return { sentence: x }
       }
       return x
-    })
-    if(!histories) return
-    setHistories(histories)
+    }))
   }
   
   useEffect(initialize, [])
