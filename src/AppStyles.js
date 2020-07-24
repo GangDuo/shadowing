@@ -23,8 +23,6 @@ const styles = css`
   right: 0;
 }
 
-.qa {margin: 10px auto;}
-.text-left {text-align: left;}
 .footer a {
   cursor: pointer;
   color: black;
