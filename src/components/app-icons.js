@@ -6,11 +6,11 @@ export function CircleSign(props) {
 }
 
 export function CorrectSign(props) {
-  return <FontAwesomeIcon icon={['far', 'circle']} size="2x" color="green" />
+  return <FontAwesomeIcon icon={['far', 'circle']} color="green" {...props} />
 }
 
 export function IncorrectSign(props) {
-  return <FontAwesomeIcon icon="times" size="2x" color="red" />
+  return <FontAwesomeIcon icon="times" color="red" {...props} />
 }
 
 export function MicrophoneSign(props) {

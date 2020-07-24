@@ -13,8 +13,15 @@ import ButtonToConvertToTextFileThenDownload from './components/ButtonToConvertT
 import { Typography , Grid, Tabs, Tab } from '@material-ui/core';
 import InterimTranscript from './components/InterimTranscript';
 import StackHistory from './components/StackHistory';
+import { makeStyles } from '@material-ui/core/styles';
 
 library.add(faMicrophone, faPlayCircle, faStopCircle, faVolumeUp, faCircle, fasCircle, faTimes, faWindows, faApple, faAndroid, faGithub, faTrash)
+
+const useStyles = makeStyles({
+  item: {
+    textAlign: 'center',
+  },
+});
 
 var langs =
 [['Afrikaans',       ['af-ZA']],
@@ -152,7 +159,7 @@ const isAndroid = () => /(android)/i.test(navigator.userAgent)
 const saveHistories = x => window.localStorage.setItem('histories', JSON.stringify(x))
 
 function App() {
-  const speechLog = useRef('');
+  const speechLog = useRef([]);
   const speech = useRef();
   const [selectedIndex, setSelectedIndex] = useState(null);
   const [dialect, setDialect] = useState();
@@ -166,6 +173,7 @@ function App() {
   const [volume, setVolume] = useState(1);
   const [histories, setHistories] = useState([]);
   const [currentTab, setCurrentTab] = React.useState(0);
+  const classes = useStyles();
 
   const setDefautVoice = () => {
     // 日本語と英語以外の声は選択肢に追加しない。
@@ -186,9 +194,12 @@ function App() {
           if (speech.current.lang === 'ja-JP') {
             transcript += '。';
           }
-          speechLog.current += transcript + '\n'
+          // judgment
+          const pattern = new RegExp(/[\s!',\.、。]/, 'g')
+          const [actual, expected] = [transcript, sentence].map(x => x.replace(pattern, '').toLowerCase())
+          speechLog.current.push({transcript, isCorrect: (actual === expected)})
           console.log(speechLog.current)
-          setFinalTranscript(speechLog.current)
+          setFinalTranscript(speechLog.current.filter(x => x.transcript.length > 0).map(x => x.transcript).join('\n'))
         } else {
           buf += transcript
         }
@@ -256,24 +267,27 @@ function App() {
   }
 
   const latelyTranscript = (n) => {
-    return finalTranscript.split('\n')
-      .filter(x => x.length > 0)
+    return (<>
+    {
+      speechLog.current
+      .filter(x => x.transcript.length > 0)
       .slice(-1 * n)
-      .map((x, i) => <p key={i}>{x}</p>)
+      .map((x, i) => {
+        return (
+        <Grid key={i} container spacing={3}>
+          <Grid item xs={1} classes={{ item: classes.item }}>
+            {x.isCorrect ? <CorrectSign /> : <IncorrectSign />}
+          </Grid>
+          <Grid item xs={11}>
+            {x.transcript}
+          </Grid>
+        </Grid>)
+      })
+    }
+    </>)
   }
 
   const handleChangedSentence = e => setSentence(e.target.value)
-
-  const judgment = (_ => {
-    const phrases = speechLog.current.split('\n').filter(x => x.length > 0)
-    if(phrases.length > 0) {
-      const pattern = new RegExp(/[\s!',\.、。]/, 'g')
-      const [actual, expected] = [phrases.pop(), sentence].map(x => x.replace(pattern, '').toLowerCase())
-      return (actual === expected) ? <CorrectSign /> : <IncorrectSign />
-    } else {
-      return (<></>)
-    }
-  })()
 
   return (
     <div className="app">
@@ -292,9 +306,6 @@ function App() {
         <Tab label="過去の台詞" />
       </Tabs>
       {currentTab === 0 && (<>
-
-      {judgment}
-
       <div className="recognition">
         <div id="results">
           <span className="final" id="final_span">{latelyTranscript(5)}</span>
@@ -389,17 +400,17 @@ function App() {
           <tr>
             <td><WindowsSign/></td>
             <td className="text-left">PC</td>
-            <td><CorrectSign/></td>
+            <td><CorrectSign size="2x"/></td>
           </tr>
           <tr>
             <td><AndroidSign/></td>
             <td className="text-left">Android</td>
-            <td><CorrectSign/></td>
+            <td><CorrectSign size="2x"/></td>
           </tr>
           <tr>
             <td><AppleSign/></td>
             <td className="text-left">iPhone</td>
-            <td><IncorrectSign/></td>
+            <td><IncorrectSign size="2x"/></td>
           </tr>
         </tbody>
       </table>
