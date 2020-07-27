@@ -18,6 +18,10 @@ const useStyles = makeStyles({
       backgroundColor: "#1976d2",
     }
   },
+  container: {
+    margin: "0 auto",
+    width: "99%",
+  }
 });
 
 function NativeSpeaker(props) {
@@ -66,7 +70,7 @@ function NativeSpeaker(props) {
       <button onClick={_ => speechSynthesis.resume()}>再開</button>
       */}
 
-      <Grid container spacing={2} alignItems="center">
+      <Grid container spacing={2} alignItems="center" classes={{root: classes.container}}>
         <Grid item>
           <Typography id="input-slider" gutterBottom>速度</Typography>
         </Grid>
@@ -79,7 +83,7 @@ function NativeSpeaker(props) {
         <Grid item><Typography>{rate}</Typography></Grid>
       </Grid>
 
-      <Grid container spacing={2} alignItems="center">
+      <Grid container spacing={2} alignItems="center" classes={{root: classes.container}}>
         <Grid item>
           <Typography id="volume-slider" gutterBottom>音量</Typography>
         </Grid>
