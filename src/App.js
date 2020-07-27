@@ -16,6 +16,9 @@ import StackHistory from './components/StackHistory';
 import { makeStyles } from '@material-ui/core/styles';
 import FrequentlyAskedQuestions from './components/FrequentlyAskedQuestions';
 
+import TabPanels from './components/TabPanels'
+import TabPanel from './components/TabPanel'
+
 library.add(faMicrophone, faPlayCircle, faStopCircle, faVolumeUp, faCircle, fasCircle, faTimes, faWindows, faApple, faAndroid, faGithub, faTrash)
 
 const useStyles = makeStyles({
@@ -293,7 +296,7 @@ function App() {
   return (
     <div className="app">
       <Typography>ドラマ・映画の名言をシャドーイング</Typography>
-
+      
       <Tabs
         value={currentTab}
         onChange={(event, newValue) => {
@@ -306,78 +309,82 @@ function App() {
         <Tab label="ホーム" />
         <Tab label="過去の台詞" />
       </Tabs>
-      {currentTab === 0 && (<>
-      <div className="recognition">
-        <div id="results">
-          <span className="final" id="final_span">{latelyTranscript(5)}</span>
-          <InterimTranscript>{interimTranscript}</InterimTranscript>
-        </div>
-        <div className="tools">
-          <Grid container direction="column" justify="space-around" alignItems="center">
-            <Grid item>
-              <div style={{display: 'none'}}>
-                <select disabled={true} value={selectedIndex}>
-                {
-                  langs.map((x, i) => <option key={x[0]} value={i}>{x[0]}</option>)
-                }
-                </select>&nbsp;&nbsp; 
-                <select disabled={true} value={dialect} style={{visibility: hasDialect ? 'visible' : 'hidden'}}>
-                {
-                  langs[selectedIndex]
-                    .filter((x, i) => i > 0)
-                    .map((x ,i) => <option key={i} value={x[0]}>{x[1]||''}</option>)
-                }
-                </select>
-              </div>
-            </Grid>
-          
-            <Grid item>
-              <ButtonToConvertToTextFileThenDownload text={finalTranscript}>
-                ログをダウンロード
-              </ButtonToConvertToTextFileThenDownload>
-            </Grid>
-            <Grid item>
-              <div style={{padding: "10px"}}>
-              <MicrophoneSwitch isPowerOn={isPowerOn}
-                              onClick={() => {setIsPowerOn(!isPowerOn)}} />
-              </div>
-            </Grid>          
-          </Grid>
-        </div>
-      </div>
-      <br/>
-      <NativeSpeaker sentence={sentence}
-        selectedVoice={selectedVoice}
-        voices={voices}
-        onChangedSentence={handleChangedSentence}
-        onChangeVoice={e => {
-          const voice = getVoiceByName(e.target.value)
-          setSelectedVoice(voice)
-          speech.current.lang = voice.lang
-          speech.current.restart()
-        }}
-        onSpeak={_ => {
-          let sentences = [{sentence}, ...histories.filter(x => x.sentence !== sentence)]
-          setHistories(sentences)
-          saveHistories(sentences)
-        }}
-        rate={rate} onChangedRate={(e, newValue) => setRate(newValue)}
-        volume={volume} onChangedVolume={(e, newValue) => setVolume(newValue)} />
-      </>)}
 
-      {currentTab === 1 && (
-        <StackHistory histories={histories}
-          toggleItemRemove={({checked, index}) => {
-            const items = histories.concat();
-            items[index].willRemove = checked
-            setHistories(items)
-          }}
-          onRemove={_ => {
-            const items = histories.filter(x => !x.willRemove).concat();
-            setHistories(items)
-            saveHistories(items)
-          }} 
-          onChange={handleChangedSentence} />)}
+      <TabPanels value={currentTab}>
+        <TabPanel>
+          <div className="recognition">
+            <div id="results">
+              <span className="final" id="final_span">{latelyTranscript(5)}</span>
+              <InterimTranscript>{interimTranscript}</InterimTranscript>
+            </div>
+            <div className="tools">
+              <Grid container direction="column" justify="space-around" alignItems="center">
+                <Grid item>
+                  <div style={{display: 'none'}}>
+                    <select disabled={true} value={selectedIndex}>
+                    {
+                      langs.map((x, i) => <option key={x[0]} value={i}>{x[0]}</option>)
+                    }
+                    </select>&nbsp;&nbsp; 
+                    <select disabled={true} value={dialect} style={{visibility: hasDialect ? 'visible' : 'hidden'}}>
+                    {
+                      langs[selectedIndex]
+                        .filter((x, i) => i > 0)
+                        .map((x ,i) => <option key={i} value={x[0]}>{x[1]||''}</option>)
+                    }
+                    </select>
+                  </div>
+                </Grid>
+              
+                <Grid item>
+                  <ButtonToConvertToTextFileThenDownload text={finalTranscript}>
+                    ログをダウンロード
+                  </ButtonToConvertToTextFileThenDownload>
+                </Grid>
+                <Grid item>
+                  <div style={{padding: "10px"}}>
+                  <MicrophoneSwitch isPowerOn={isPowerOn}
+                                  onClick={() => {setIsPowerOn(!isPowerOn)}} />
+                  </div>
+                </Grid>          
+              </Grid>
+            </div>
+          </div>
+          <br/>
+          <NativeSpeaker sentence={sentence}
+            selectedVoice={selectedVoice}
+            voices={voices}
+            onChangedSentence={handleChangedSentence}
+            onChangeVoice={e => {
+              const voice = getVoiceByName(e.target.value)
+              setSelectedVoice(voice)
+              speech.current.lang = voice.lang
+              speech.current.restart()
+            }}
+            onSpeak={_ => {
+              let sentences = [{sentence}, ...histories.filter(x => x.sentence !== sentence)]
+              setHistories(sentences)
+              saveHistories(sentences)
+            }}
+            rate={rate} onChangedRate={(e, newValue) => setRate(newValue)}
+            volume={volume} onChangedVolume={(e, newValue) => setVolume(newValue)} />
+        </TabPanel>
+
+        <TabPanel>
+          <StackHistory histories={histories}
+            toggleItemRemove={({checked, index}) => {
+              const items = histories.concat();
+              items[index].willRemove = checked
+              setHistories(items)
+            }}
+            onRemove={_ => {
+              const items = histories.filter(x => !x.willRemove).concat();
+              setHistories(items)
+              saveHistories(items)
+            }} 
+            onChange={handleChangedSentence} />
+        </TabPanel>
+      </TabPanels>
 
       <FrequentlyAskedQuestions />
 
