@@ -234,11 +234,7 @@ function App() {
           if (speech.current.lang === 'ja-JP') {
             transcript += '。';
           }
-          // judgment
-          const pattern = new RegExp(/[\s!',-\.\?、。]/, 'g')
-          const [actual, expected] = [transcript, sentence].map(x => x.replace(pattern, '').toLowerCase())
-          speechLog.current.push({transcript, isCorrect: (actual === expected)})
-          console.log(speechLog.current)
+          speechLog.current.push({transcript})
           setFinalTranscript(speechLog.current.filter(x => x.transcript.length > 0).map(x => x.transcript).join('\n'))
         } else {
           buf += transcript
@@ -289,6 +285,21 @@ function App() {
       return xs
     })[0])
   }, [selectedVoice])
+
+  // 「finalTranscript」の値に変化があったら、音声認識の終了とする
+  useEffect(_ => {
+    if(speechLog.current.length === 0) return
+
+    const lastSpeechLog = speechLog.current[speechLog.current.length-1]
+    if(!Object.keys(lastSpeechLog).includes("isCorrect")) {
+      console.log(`updated finalTranscript ${sentence}`)
+      // judgment
+      const pattern = new RegExp(/[\s!',-\.\?、。]/, 'g')
+      const [actual, expected] = [lastSpeechLog.transcript, sentence].map(x => x.replace(pattern, '').toLowerCase().trim())
+      lastSpeechLog.isCorrect = (actual === expected)
+      console.log(speechLog.current)
+    }
+  }, [sentence, finalTranscript])
 
   if(!selectedVoice || !selectedIndex) {
     console.log('音声取得中')
