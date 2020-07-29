@@ -28,6 +28,14 @@ const styles = css`
   color: black;
   text-decoration: none;
 }
+
+.training-mode {
+  margin: 15px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.training-mode .button { cursor: "pointer"; }
 `
 
 export default styles

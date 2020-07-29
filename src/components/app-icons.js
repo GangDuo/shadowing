@@ -40,3 +40,11 @@ export function GithubSign(props) {
 export function TrashSign(props) {
   return <FontAwesomeIcon icon="trash" {...props} />
 }
+
+export function TrophySign(props) {
+  return <FontAwesomeIcon icon="trophy" {...props} />
+}
+
+export function ArrowAltCircleRightSign(props) {
+  return <FontAwesomeIcon icon="arrow-alt-circle-right" {...props} />
+}

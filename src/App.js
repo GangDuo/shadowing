@@ -4,22 +4,23 @@ import SpeechDaemon from './SpeechDaemon';
 import styles from './AppStyles';
 import MicrophoneSwitch from './components/MicrophoneSwitch';
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faMicrophone, faPlayCircle, faStopCircle, faVolumeUp, faTimes, faTrash, faCircle as fasCircle } from '@fortawesome/free-solid-svg-icons'
+import { faMicrophone, faPlayCircle, faStopCircle, faVolumeUp, faTimes, faTrash, faCircle as fasCircle,
+  faTrophy, faArrowAltCircleRight } from '@fortawesome/free-solid-svg-icons'
 import { faCircle } from '@fortawesome/free-regular-svg-icons';
 import { faWindows, faApple, faAndroid, faGithub } from '@fortawesome/free-brands-svg-icons';
 import NativeSpeaker from './components/NativeSpeaker';
-import { CorrectSign, IncorrectSign, GithubSign } from './components/app-icons';
+import { CorrectSign, IncorrectSign, GithubSign, TrophySign, ArrowAltCircleRightSign } from './components/app-icons';
 import ButtonToConvertToTextFileThenDownload from './components/ButtonToConvertToTextFileThenDownload';
 import { Typography , Grid, Tabs, Tab } from '@material-ui/core';
 import InterimTranscript from './components/InterimTranscript';
 import StackHistory from './components/StackHistory';
 import { makeStyles } from '@material-ui/core/styles';
 import FrequentlyAskedQuestions from './components/FrequentlyAskedQuestions';
-
+import ToggleButton from './components/ToggleButton';
 import TabPanels from './components/TabPanels'
 import TabPanel from './components/TabPanel'
 
-library.add(faMicrophone, faPlayCircle, faStopCircle, faVolumeUp, faCircle, fasCircle, faTimes, faWindows, faApple, faAndroid, faGithub, faTrash)
+library.add(faMicrophone, faPlayCircle, faStopCircle, faVolumeUp, faCircle, fasCircle, faTimes, faWindows, faApple, faAndroid, faGithub, faTrash, faTrophy, faArrowAltCircleRight)
 
 const useStyles = makeStyles({
   item: {
@@ -130,6 +131,39 @@ var langs =
  ['हिन्दी',             ['hi-IN']],
  ['ภาษาไทย',         ['th-TH']]];
 
+const famousQuotes = [
+  "You're gonna need a bigger boat.",
+  "May the Force be with you.",
+  "With great power comes great responsibility.",
+  "I never had any friends later on like the ones I had when I was twelve. Jesus, does anyone?",
+  "We think too much, and feel too little.",
+  "Mama always said life was like a box of chocolates. You never know what you're gonna get.",
+  "This is Sparta!",
+  "I'll have what she's having.",
+  "War has already begun.",
+  "Elementary, my dear Watson.",
+  "I feel the need-the need for speed!",
+  "It was Beauty killed the Beast.",
+  "They're here",
+  "Magic Mirror on the wall, who is the fairest one of all?",
+  "Oh yes, the past can hurt. But you can either run from it, or learn from it.",
+  "Then,you’re saying yes,not because you have to,not because a covenant tells you to,but because you know in your heart that you want to.",
+  "Truth is, sometimes I miss you so bad I can hardly stand it...",
+  "I mean, funny like I'm a clown? I amuse you?",
+  "After all, tomorrow is another day!",
+  "Why are you trying so hard to fit in when you were born to stand out?",
+  "I'm the king of the world!",
+  "Show me the money!",
+  "Hey. Don't ever let somebody tell you... You can't do something. Not even me. All right?",
+  "You got a dream... You gotta protect it. People can't do somethin' themselves, they wanna tell you you can't do it. If you want somethin', go get it. Period.",
+  "To infinity and beyond!",
+  "I need your help",
+  "You talkin' to me?",
+  "Son, you’re gonna have to face him sooner or later. If you’re afraid of something, you've got to stand and face it.",
+  "You have all these rules, and you think they’ll save you.",
+  "Usually they’re just trying to protect you because they love you."
+]
+
 if(!Array.prototype.skip) {
   Array.prototype.skip = function(n) {
     if(n < 1) return this
@@ -178,6 +212,8 @@ function App() {
   const [histories, setHistories] = useState([]);
   const [currentTab, setCurrentTab] = React.useState(0);
   const classes = useStyles();
+  const [isTrialRun, setIsTrialRun] = useState(false);
+  const [famousQuote, setFamousQuote] = useState(famousQuotes);
 
   const setDefautVoice = () => {
     // 日本語と英語以外の声は選択肢に追加しない。
@@ -199,7 +235,7 @@ function App() {
             transcript += '。';
           }
           // judgment
-          const pattern = new RegExp(/[\s!',\.、。]/, 'g')
+          const pattern = new RegExp(/[\s!',-\.\?、。]/, 'g')
           const [actual, expected] = [transcript, sentence].map(x => x.replace(pattern, '').toLowerCase())
           speechLog.current.push({transcript, isCorrect: (actual === expected)})
           console.log(speechLog.current)
@@ -350,7 +386,32 @@ function App() {
               </Grid>
             </div>
           </div>
-          <br/>
+
+          <div className="training-mode">
+            <ToggleButton checked={isTrialRun} onChange={e => setIsTrialRun(!isTrialRun)}>
+              <TrophySign/>
+            </ToggleButton>
+
+            {isTrialRun && (
+            <div className="button" onClick={e => {
+              const xs = famousQuote.concat()
+              if(xs.length === 0) {
+                setFamousQuote(famousQuotes)
+                setIsTrialRun(false)
+                alert("おしまい")
+                return
+              }
+              var random = Math.floor( Math.random() * xs.length );
+              console.log(`${random}/${xs.length}`)
+              setSentence(xs[random])
+              xs.splice(random, 1)
+              setFamousQuote(xs)
+            }}>
+              <ArrowAltCircleRightSign size="3x" color="#1976d2"/>
+            </div>
+            )}
+          </div>          
+
           <NativeSpeaker sentence={sentence}
             selectedVoice={selectedVoice}
             voices={voices}
