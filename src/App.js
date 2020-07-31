@@ -214,6 +214,7 @@ function App() {
   const classes = useStyles();
   const [isTrialRun, setIsTrialRun] = useState(false);
   const [famousQuote, setFamousQuote] = useState(famousQuotes);
+  const inputSentence = useRef();
 
   const setDefautVoice = () => {
     // 日本語と英語以外の声は選択肢に追加しない。
@@ -234,7 +235,11 @@ function App() {
           if (speech.current.lang === 'ja-JP') {
             transcript += '。';
           }
-          speechLog.current.push({transcript})
+          // judgment
+          const pattern = new RegExp(/[\s!',-\.\?’、。]/, 'g')
+          const [actual, expected] = [transcript, inputSentence.current.value].map(x => x.replace(pattern, '').toLowerCase())
+          speechLog.current.push({transcript, isCorrect: (actual === expected), sentence: inputSentence.current.value})
+          console.log(`${transcript} : ${inputSentence.current.value}`)
           setFinalTranscript(speechLog.current.filter(x => x.transcript.length > 0).map(x => x.transcript).join('\n'))
         } else {
           buf += transcript
@@ -270,7 +275,7 @@ function App() {
       return x
     }))
   }
-  
+
   useEffect(initialize, [])
 
   useEffect(_ => {
@@ -285,21 +290,6 @@ function App() {
       return xs
     })[0])
   }, [selectedVoice])
-
-  // 「finalTranscript」の値に変化があったら、音声認識の終了とする
-  useEffect(_ => {
-    if(speechLog.current.length === 0) return
-
-    const lastSpeechLog = speechLog.current[speechLog.current.length-1]
-    if(!Object.keys(lastSpeechLog).includes("isCorrect")) {
-      console.log(`updated finalTranscript ${sentence}`)
-      // judgment
-      const pattern = new RegExp(/[\s!',-\.\?、。]/, 'g')
-      const [actual, expected] = [lastSpeechLog.transcript, sentence].map(x => x.replace(pattern, '').toLowerCase().trim())
-      lastSpeechLog.isCorrect = (actual === expected)
-      console.log(speechLog.current)
-    }
-  }, [sentence, finalTranscript])
 
   if(!selectedVoice || !selectedIndex) {
     console.log('音声取得中')
@@ -423,7 +413,7 @@ function App() {
             )}
           </div>          
 
-          <NativeSpeaker sentence={sentence}
+          <NativeSpeaker sentence={sentence} ref={inputSentence}
             selectedVoice={selectedVoice}
             voices={voices}
             onChangedSentence={handleChangedSentence}

@@ -24,7 +24,7 @@ const useStyles = makeStyles({
   }
 });
 
-function NativeSpeaker(props) {
+const NativeSpeaker = React.forwardRef(function(props, ref) {
   const classes = useStyles();
   const {
     onChangedSentence, onChangeVoice, onSpeak,
@@ -52,6 +52,7 @@ function NativeSpeaker(props) {
       <FormControl required fullWidth variant="outlined">
         <InputLabel htmlFor="outlined-adornment-sentence">台詞</InputLabel>
         <OutlinedInput
+          inputRef={ref}
           id="outlined-adornment-sentence"
           type='text'
           labelWidth={50}
@@ -116,6 +117,6 @@ function NativeSpeaker(props) {
       </FormControl>
     </div>
   )
-}
+})
 
 export default NativeSpeaker;
